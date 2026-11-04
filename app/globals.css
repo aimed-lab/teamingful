@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-page font-sans text-ink antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading font-bold;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-card border border-line bg-white;
+  }
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-btn bg-green px-4 font-medium text-white hover:bg-green-dark;
+  }
+  .btn-outline {
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-btn border border-green bg-transparent px-4 font-medium text-green hover:bg-green-light;
+  }
+  .input {
+    @apply min-h-[44px] w-full rounded-btn border border-line bg-white px-3 text-ink outline-none focus:border-green;
+  }
+}
