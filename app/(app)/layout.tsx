@@ -1,4 +1,5 @@
 import AppFrame from "@/components/AppFrame";
+import TimeZoneCookie from "@/components/TimeZoneCookie";
 import { createClient } from "@/lib/supabase/server";
 import { initials } from "@/lib/initials";
 
@@ -48,6 +49,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <AppFrame activeEvent={activeEvent} user={frameUser}>
+      <TimeZoneCookie />
       {children}
     </AppFrame>
   );

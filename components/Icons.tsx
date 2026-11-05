@@ -59,3 +59,24 @@ export const LockIcon = (p: P) => (
 export const FlaskIcon = (p: P) => (
   <Svg {...p}><path d="M9.5 3h5M10.5 3v6L5 19a1.5 1.5 0 001.3 2h11.4a1.5 1.5 0 001.3-2l-5.5-10V3" /><path d="M7.5 15h9" /></Svg>
 );
+export const XIcon = (p: P) => (
+  <Svg {...p}><path d="M6 6l12 12M18 6L6 18" /></Svg>
+);
+export const MicIcon = (p: P) => (
+  <Svg {...p}><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21" /></Svg>
+);
+export const NoteIcon = (p: P) => (
+  <Svg {...p}><path d="M5 19l1-4L16.5 4.5a2 2 0 013 3L9 18z" /><path d="M5 19l4-1" /></Svg>
+);
+export const PlayIcon = (p: P) => (
+  <Svg {...p}><path d="M8 5.5v13l10.5-6.5z" /></Svg>
+);
+export const PauseIcon = (p: P) => (
+  <Svg {...p}><path d="M8.5 5.5v13M15.5 5.5v13" /></Svg>
+);
+export const PlusIcon = (p: P) => (
+  <Svg {...p}><path d="M12 5v14M5 12h14" /></Svg>
+);
+export const CopyIcon = (p: P) => (
+  <Svg {...p}><rect x="8.5" y="8.5" width="11" height="11" rx="2" /><path d="M15.5 8.5V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7.5a2 2 0 002 2h2.5" /></Svg>
+);

@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getLocalToday } from "@/lib/localToday";
 import { createClient } from "@/lib/supabase/server";
 
 // Start event mode. Only one event can be active, so end any others first.
@@ -23,7 +24,7 @@ export async function startEvent(formData: FormData) {
     name: String(formData.get("name") ?? "").trim(),
     location: String(formData.get("location") ?? "").trim() || null,
     starts_on:
-      String(formData.get("starts_on") ?? "") || new Date().toISOString().slice(0, 10),
+      String(formData.get("starts_on") ?? "") || await getLocalToday(),
     ends_on: String(formData.get("ends_on") ?? "") || null,
     is_active: true,
   });
