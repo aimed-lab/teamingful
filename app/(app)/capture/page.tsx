@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import EmptyState from "@/components/EmptyState";
-import { CameraIcon } from "@/components/Icons";
+import CaptureScreen from "@/components/capture/CaptureScreen";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Capture · Teamingful" };
 
-export default function CapturePage() {
-  return (
-    <EmptyState
-      icon={<CameraIcon />}
-      title="Capture is coming next"
-      text="Soon you'll snap a card or hold to talk here."
-    />
-  );
+export default async function CapturePage() {
+  const supabase = await createClient();
+  const { data: event } = await supabase.from("events").select("name").eq("is_active", true).maybeSingle();
+  return <CaptureScreen eventName={event?.name ?? null} />;
 }
-

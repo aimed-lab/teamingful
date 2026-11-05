@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import Greeting from "@/components/Greeting";
 import FirstVisit from "@/components/FirstVisit";
 import { ConferenceCard, FinishProfileCard } from "@/components/SideCards";
+import { getLocalToday } from "@/lib/localToday";
 import { partOfDay } from "@/lib/partOfDay";
 import EventForm from "@/components/EventForm";
 import { endEvent } from "@/app/actions";
@@ -35,7 +36,7 @@ function TeamRowItem({ team, me }: { team: TeamRow; me: string }) {
   const grayLine = first?.organization || team.summary || "";
   return (
     <Link
-      href={`/teams`}
+      href={`/teams/${team.id}`}
       className="flex min-h-[44px] items-center gap-3 border-b border-line px-4 py-3 last:border-b-0"
     >
       <TeamMark
@@ -57,8 +58,8 @@ export default async function TodayPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const today = new Date().toISOString().slice(0, 10);
-  const weekEnd = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  const today = await getLocalToday();
+  const weekEnd = await getLocalToday(7);
 
   const [{ data: profile }, { data: event }, { data: promises }, { data: teams }] =
     await Promise.all([
@@ -67,6 +68,7 @@ export default async function TodayPage() {
       supabase
         .from("promises")
         .select("text")
+        .eq("owed_by", "owner")
         .eq("done", false)
         .gte("due_on", today)
         .lte("due_on", weekEnd)
