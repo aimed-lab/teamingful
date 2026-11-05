@@ -1,31 +1,30 @@
 import type { Config } from "tailwindcss";
 
-// Design tokens for Teamingful. Use these names in every screen.
+// Brand tokens. See docs/brand.md.
+// Color means who: blue = you, marigold = them, green = shared / the team.
 const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        green: {
-          DEFAULT: "#1A5632", // primary
-          dark: "#0f3a21",
-          light: "#e4ece6",
-        },
-        "partner-green": "#5d8a6c",
-        surface: "#f3f1ea",
-        page: "#fbfaf7",
-        line: "#e2dfd6",
-        ink: "#1c1f1d",
-        muted: "#6b6f6c",
-        amber: "#c48a1c", // needs follow-up
+        ink: "#121418", // text, primary buttons, dark panels
+        paper: "#F7F8FA", // page background
+        line: "#E4E7EC", // borders
+        muted: "#5F6878", // secondary text
+        you: { DEFAULT: "#2F5BFF", light: "#EAF0FF" },
+        // Never put white text on marigold. Use text-them-text on them-light.
+        them: { DEFAULT: "#FFB627", light: "#FFF4DA", text: "#8A5A00" },
+        team: { DEFAULT: "#17A267", light: "#E4F6EC", text: "#0D6B43" },
       },
       borderRadius: {
-        card: "12px",
-        btn: "11px",
+        card: "16px",
       },
       fontFamily: {
         heading: ["var(--font-heading)", "sans-serif"],
         sans: ["var(--font-body)", "sans-serif"],
+      },
+      boxShadow: {
+        chip: "0 8px 24px rgba(18,20,24,.08)",
       },
     },
   },

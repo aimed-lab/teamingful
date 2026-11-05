@@ -1,26 +1,32 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Inter } from "next/font/google";
+import { Bricolage_Grotesque, Geist } from "next/font/google";
 import "./globals.css";
 
 const heading = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["500", "700"],
+  weight: ["600", "800"],
   variable: "--font-heading",
 });
 
-const body = Inter({
+const body = Geist({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
   variable: "--font-body",
 });
 
+const TITLE = "Teamingful: every handshake becomes a team";
+const DESCRIPTION =
+  "Snap their badge or say a few words. Teamingful writes down who you met and what each of you promised, then gives you both one shared place to follow through.";
+
 export const metadata: Metadata = {
-  title: "Teamingful",
-  description: "Everyone you meet, as teams.",
+  metadataBase: new URL("https://teamingful.com"),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: { title: TITLE, description: DESCRIPTION, siteName: "Teamingful", type: "website" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1A5632",
+  themeColor: "#F7F8FA",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

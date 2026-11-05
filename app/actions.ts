@@ -29,6 +29,7 @@ export async function startEvent(formData: FormData) {
   });
 
   revalidatePath("/", "layout");
+  redirect("/today");
 }
 
 // End the active event.
@@ -36,24 +37,29 @@ export async function endEvent() {
   const supabase = await createClient();
   await supabase.from("events").update({ is_active: false }).eq("is_active", true);
   revalidatePath("/", "layout");
+  redirect("/today");
 }
 
-// Save the name / title / organization on the Me screen.
-export async function saveProfile(formData: FormData) {
+// Save the details on the Me screen. Returns { saved: true } for the "Saved" note.
+export async function saveProfile(_prev: { saved: boolean } | null, formData: FormData) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/signin");
 
+  const text = (key: string) => String(formData.get(key) ?? "").trim() || null;
+
   await supabase.from("profiles").upsert({
     id: user.id,
-    full_name: String(formData.get("full_name") ?? "").trim() || null,
-    title: String(formData.get("title") ?? "").trim() || null,
-    organization: String(formData.get("organization") ?? "").trim() || null,
+    full_name: text("full_name"),
+    title: text("title"),
+    organization: text("organization"),
+    orcid: text("orcid"),
   });
 
   revalidatePath("/", "layout");
+  return { saved: true };
 }
 
 export async function signOut() {

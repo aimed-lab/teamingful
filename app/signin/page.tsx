@@ -1,68 +1,52 @@
-"use client";
+import type { Metadata } from "next";
+import SignInForm from "@/components/SignInForm";
+import TeamMark from "@/components/TeamMark";
+import { CameraIcon, ChecklistIcon, LinkIcon } from "@/components/Icons";
 
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+export const metadata: Metadata = { title: "Sign in · Teamingful" };
 
-// Google sign-in is hidden until the Google provider is set up in Supabase.
-const GOOGLE_SIGNIN_ENABLED = false;
+const POINTS = [
+  { icon: <CameraIcon size={20} />, text: "Capture a card, badge or slide in seconds" },
+  { icon: <ChecklistIcon size={20} />, text: "See who promised what, on both sides" },
+  { icon: <LinkIcon size={20} />, text: "Share slides with a link, no app needed" },
+];
 
 export default function SignInPage() {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-
-  const redirectTo = () => `${window.location.origin}/auth/callback`;
-
-  async function signInWithGoogle() {
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: redirectTo() },
-    });
-    if (error) setMessage(error.message);
-  }
-
-  async function sendLink(e: React.FormEvent) {
-    e.preventDefault();
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: redirectTo() },
-    });
-    setMessage(error ? error.message : "Check your email for the sign-in link.");
-  }
-
   return (
-    <main className="mx-auto flex min-h-screen max-w-[420px] flex-col justify-center px-6 py-12">
-      <h1 className="font-heading text-4xl text-green">Teamingful</h1>
-      <p className="mt-2 text-muted">Everyone you meet, as teams.</p>
+    <main className="min-h-screen lg:grid lg:grid-cols-2">
+      {/* Green side: compact on phone, full half on laptop */}
+      <section className="bg-ink px-6 py-8 text-white lg:flex lg:flex-col lg:justify-between lg:p-16">
+        <div>
+          <div className="lg:hidden">
+            <TeamMark size="md" />
+          </div>
+          <div className="hidden lg:block">
+            <TeamMark size="xl" />
+          </div>
+          <h1 className="mt-4 max-w-md font-heading text-3xl font-extrabold leading-[1.05] tracking-[-0.03em] lg:mt-8 lg:text-[44px]">
+            Every handshake becomes a team.
+          </h1>
+          <p className="mt-2 max-w-md text-white/70 lg:mt-4">
+            Snap a business card or say a few words. Teamingful turns the meeting into a
+            team of two and keeps your promises for you.
+          </p>
+        </div>
 
-      <div className="mt-10 space-y-4">
-        {GOOGLE_SIGNIN_ENABLED && (
-          <>
-            <button onClick={signInWithGoogle} className="btn w-full">
-              Continue with Google
-            </button>
+        <ul className="hidden space-y-4 lg:block">
+          {POINTS.map((p) => (
+            <li key={p.text} className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-card bg-white/10 text-white/70">
+                {p.icon}
+              </span>
+              <span>{p.text}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-            <p className="text-center text-sm text-muted">or</p>
-          </>
-        )}
-
-        <form onSubmit={sendLink} className="space-y-3">
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@university.edu"
-            className="input"
-          />
-          <button type="submit" className="btn-outline w-full">
-            Email me a sign-in link
-          </button>
-        </form>
-
-        {message && <p className="text-sm text-muted">{message}</p>}
-      </div>
+      <section className="flex justify-center px-6 py-10 lg:items-center">
+        <SignInForm />
+      </section>
     </main>
   );
 }

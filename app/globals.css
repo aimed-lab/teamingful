@@ -3,13 +3,26 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
   body {
-    @apply bg-page font-sans text-ink antialiased;
+    @apply overflow-x-hidden bg-paper font-sans text-ink antialiased;
   }
   h1,
   h2,
   h3 {
-    @apply font-heading font-bold;
+    @apply font-heading font-semibold tracking-tight;
+  }
+  /* Visible keyboard focus on everything */
+  :focus-visible {
+    outline: 2px solid #2f5bff;
+    outline-offset: 2px;
   }
 }
 
@@ -17,13 +30,39 @@
   .card {
     @apply rounded-card border border-line bg-white;
   }
+  /* Primary button: ink pill */
   .btn {
-    @apply inline-flex min-h-[44px] items-center justify-center rounded-btn bg-green px-4 font-medium text-white hover:bg-green-dark;
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-full bg-ink px-5 font-medium text-white hover:bg-ink/85;
   }
-  .btn-outline {
-    @apply inline-flex min-h-[44px] items-center justify-center rounded-btn border border-green bg-transparent px-4 font-medium text-green hover:bg-green-light;
+  /* Secondary button: white pill with a line border */
+  .btn-secondary {
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-full border border-line bg-white px-5 font-medium text-ink hover:bg-paper;
+  }
+  /* Swipeable rows: keep scrolling, hide the bar */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
   .input {
-    @apply min-h-[44px] w-full rounded-btn border border-line bg-white px-3 text-ink outline-none focus:border-green;
+    @apply min-h-[44px] w-full rounded-xl border border-line bg-white px-3 text-ink outline-none focus:border-you;
+  }
+}
+
+/* Landing hero chips: fade and rise once on load. No motion if the user asks for none. */
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chip-in {
+    animation: chip-in 0.5s ease-out both;
   }
 }

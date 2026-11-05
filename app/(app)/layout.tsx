@@ -1,15 +1,22 @@
 import AppFrame from "@/components/AppFrame";
 import { createClient } from "@/lib/supabase/server";
+import { initials } from "@/lib/initials";
 
-// Layout for every signed-in page. Loads the active event for the sidebar card.
+// Layout for every signed-in page. Loads the user and the active event for the sidebar.
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { data: event } = await supabase
-    .from("events")
-    .select("id, name")
-    .eq("is_active", true)
-    .maybeSingle();
+  const [{ data: profile }, { data: event }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("full_name, title, organization")
+      .eq("id", user!.id)
+      .maybeSingle(),
+    supabase.from("events").select("id, name").eq("is_active", true).maybeSingle(),
+  ]);
 
   let activeEvent = null;
   if (event) {
@@ -31,5 +38,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     activeEvent = { name: event.name, people, promises };
   }
 
-  return <AppFrame activeEvent={activeEvent}>{children}</AppFrame>;
+  const name = profile?.full_name?.trim();
+  const frameUser = {
+    initials: initials(name || user!.email),
+    firstName: name ? name.split(/\s+/)[0] : (user!.email ?? "Me").split("@")[0],
+    organization: profile?.organization ?? null,
+    profileComplete: Boolean(profile?.title?.trim() && profile?.organization?.trim()),
+  };
+
+  return (
+    <AppFrame activeEvent={activeEvent} user={frameUser}>
+      {children}
+    </AppFrame>
+  );
 }

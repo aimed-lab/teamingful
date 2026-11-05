@@ -2,9 +2,15 @@ import Link from "next/link";
 import TeamMark from "@/components/TeamMark";
 import { createClient } from "@/lib/supabase/server";
 import { initials } from "@/lib/initials";
+import type { Metadata } from "next";
 import Greeting from "@/components/Greeting";
+import FirstVisit from "@/components/FirstVisit";
+import { ConferenceCard, FinishProfileCard } from "@/components/SideCards";
+import { partOfDay } from "@/lib/partOfDay";
 import EventForm from "@/components/EventForm";
 import { endEvent } from "@/app/actions";
+
+export const metadata: Metadata = { title: "Today · Teamingful" };
 
 type TeamRow = {
   id: string;
@@ -56,7 +62,7 @@ export default async function TodayPage() {
 
   const [{ data: profile }, { data: event }, { data: promises }, { data: teams }] =
     await Promise.all([
-      supabase.from("profiles").select("full_name").eq("id", user!.id).maybeSingle(),
+      supabase.from("profiles").select("full_name, title, organization").eq("id", user!.id).maybeSingle(),
       supabase.from("events").select("*").eq("is_active", true).maybeSingle(),
       supabase
         .from("promises")
@@ -78,47 +84,48 @@ export default async function TodayPage() {
   const todayTeams = allTeams.filter((t) => t.met_on === today);
   const earlier = allTeams.filter((t) => t.met_on !== today).slice(0, 10);
 
+  const profileIncomplete = !profile?.title?.trim() || !profile?.organization?.trim();
+
   return (
-    <div className="space-y-5">
+    <div className="xl:grid xl:grid-cols-[640px_300px] xl:items-start xl:gap-10">
+      <div className="min-w-0 space-y-5">
       {event ? (
-        <div className="flex items-center justify-between gap-3 rounded-card bg-green p-4 text-white">
+        <div className="flex items-center justify-between gap-3 rounded-card bg-ink p-4 text-white">
           <div>
             <p className="font-heading text-lg font-bold">You&apos;re at {event.name}</p>
             <p className="text-sm text-white/80">
               {[event.location, dayOfEvent(event.starts_on, event.ends_on)]
                 .filter(Boolean)
-                .join(" · ")}
+                .join(", ")}
             </p>
           </div>
           <form action={endEvent}>
-            <button className="min-h-[44px] rounded-btn border border-white px-4 font-medium">
+            <button className="min-h-[44px] rounded-full bg-white/15 px-5 font-medium hover:bg-white/25">
               End
             </button>
           </form>
         </div>
       ) : null}
 
-      <Greeting firstName={firstName} />
+      <Greeting
+        firstName={firstName}
+        initialPart={partOfDay(new Date().getUTCHours())}
+        subtitle={allTeams.length === 0 ? "Here is how your first team will happen." : undefined}
+      />
 
-      {!event && <EventForm />}
+      {!event && allTeams.length > 0 && <EventForm />}
 
       {(promises ?? []).length > 0 && (
-        <div className="rounded-card bg-green-light p-4">
-          <p className="font-medium text-green">
+        <div className="rounded-card bg-them-light p-4">
+          <p className="font-medium text-them-text">
             {promises!.length} promises this week
           </p>
-          <p className="mt-1 text-sm">{promises![0].text}</p>
+          <p className="mt-1 text-sm text-ink">{promises![0].text}</p>
         </div>
       )}
 
       {allTeams.length === 0 ? (
-        <div className="card p-6 text-center">
-          <p className="font-medium">Met someone? Press the capture button.</p>
-          <p className="mt-1 text-sm text-muted">
-            <span className="lg:hidden">It&apos;s the big green button below.</span>
-            <span className="hidden lg:inline">It&apos;s the green Capture button on the left.</span>
-          </p>
-        </div>
+        <FirstVisit />
       ) : (
         <>
           {todayTeams.length > 0 && (
@@ -142,6 +149,14 @@ export default async function TodayPage() {
             </section>
           )}
         </>
+      )}
+      </div>
+
+      {(profileIncomplete || !event) && (
+        <aside className="mt-5 space-y-5 xl:mt-0">
+          {profileIncomplete && <FinishProfileCard initials={me} />}
+          {!event && <ConferenceCard />}
+        </aside>
       )}
     </div>
   );

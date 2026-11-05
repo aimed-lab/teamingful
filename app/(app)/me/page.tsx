@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
+import Avatar from "@/components/Avatar";
+import ProfileForm from "@/components/ProfileForm";
 import { createClient } from "@/lib/supabase/server";
-import { saveProfile, signOut } from "@/app/actions";
+import { initials } from "@/lib/initials";
+import { signOut } from "@/app/actions";
+
+export const metadata: Metadata = { title: "Me · Teamingful" };
 
 export default async function MePage() {
   const supabase = await createClient();
@@ -8,42 +14,39 @@ export default async function MePage() {
   } = await supabase.auth.getUser();
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, title, organization")
+    .select("full_name, title, organization, orcid")
     .eq("id", user!.id)
     .maybeSingle();
 
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl">Me</h1>
-        <p className="mt-2 text-muted">Your details, shown to the people you team up with.</p>
+    <div className="max-w-xl space-y-6">
+      <h1 className="text-2xl">Me</h1>
+
+      <section>
+        <h2 className="mb-2 text-lg">How others see you</h2>
+        <div className="card flex items-center gap-4 p-4">
+          <Avatar text={initials(profile?.full_name || user!.email)} size="lg" />
+          <div className="min-w-0">
+            <p className="truncate font-medium">{profile?.full_name || "Your name"}</p>
+            {profile?.title && <p className="truncate text-sm">{profile.title}</p>}
+            {profile?.organization && (
+              <p className="truncate text-sm text-muted">{profile.organization}</p>
+            )}
+          </div>
+        </div>
+        <p className="mt-2 text-sm text-muted">
+          This is what people see when you share a team with them.
+        </p>
+      </section>
+
+      <ProfileForm profile={profile} />
+
+      <div className="space-y-1">
+        <p className="text-sm text-muted">Signed in as {user!.email}</p>
+        <form action={signOut}>
+          <button className="min-h-[44px] text-muted underline hover:text-ink">Sign out</button>
+        </form>
       </div>
-
-      <p className="text-sm text-muted">Signed in as {user!.email}</p>
-
-      <form action={saveProfile} className="card space-y-3 p-4">
-        <label className="block text-sm text-muted">
-          Full name
-          <input name="full_name" defaultValue={profile?.full_name ?? ""} className="input mt-1" />
-        </label>
-        <label className="block text-sm text-muted">
-          Title
-          <input name="title" defaultValue={profile?.title ?? ""} className="input mt-1" />
-        </label>
-        <label className="block text-sm text-muted">
-          Organization
-          <input
-            name="organization"
-            defaultValue={profile?.organization ?? ""}
-            className="input mt-1"
-          />
-        </label>
-        <button className="btn w-full">Save</button>
-      </form>
-
-      <form action={signOut}>
-        <button className="btn-outline w-full">Sign out</button>
-      </form>
     </div>
   );
 }

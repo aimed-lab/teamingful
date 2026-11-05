@@ -2,8 +2,9 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Runs before every page. Refreshes the session and sends signed-out
-// users to /signin. Public: /signin, /auth/*, /t/[token] (share page).
-const PUBLIC_PREFIXES = ["/signin", "/auth", "/t/"];
+// users to /signin. Public: / (landing), /landing/*, /signin, /auth/*,
+// /t/[token] (share page), /privacy, /terms and the social image.
+const PUBLIC_PREFIXES = ["/landing", "/signin", "/auth", "/t/", "/privacy", "/terms", "/opengraph-image"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -30,7 +31,14 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isPublic = PUBLIC_PREFIXES.some((p) => path.startsWith(p));
+  const isPublic = path === "/" || PUBLIC_PREFIXES.some((p) => path.startsWith(p));
+
+  // Signed-in users skip the landing page.
+  if (user && path === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/today";
+    return NextResponse.redirect(url);
+  }
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
@@ -44,6 +52,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon.svg|manifest.webmanifest).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|icon-192.png|icon-512.png|apple-icon|manifest.webmanifest).*)",
   ],
 };
